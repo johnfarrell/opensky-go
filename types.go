@@ -63,3 +63,10 @@ func parseStateRow(rowdata []interface{}) (State, error) {
 
 	return state, nil
 }
+
+type BoundingBox struct {
+	LongitudeMin float64
+	LongitudeMax float64
+	LatitudeMin  float64
+	LatitudeMax  float64
+}

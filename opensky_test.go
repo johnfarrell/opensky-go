@@ -90,7 +90,12 @@ func TestClient_GetStates(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := cli.GetStates()
+			_, err := cli.GetStates(&BoundingBox{
+				LongitudeMin: -122.4845,
+				LongitudeMax: -122.1693,
+				LatitudeMin:  47.5014,
+				LatitudeMax:  47.6954,
+			})
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetStates() error = %v, wantErr %v", err, tt.wantErr)
 				return

@@ -1,10 +1,12 @@
 package opensky
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 	"time"
 )
 
@@ -31,14 +33,26 @@ func NewClient(opts ...ClientOption) (*Client, error) {
 	return cli, nil
 }
 
-func (cli *Client) GetStates() (StateResponse, error) {
-	endpoint, _ := url.JoinPath(cli.baseUrl, "states/all")
-	req, _ := http.NewRequest(http.MethodGet, endpoint, http.NoBody)
+// GetStates wraps GetStatesWithContext with context.Background().
+func (cli *Client) GetStates(bbox *BoundingBox) (StateResponse, error) {
+	return cli.GetStatesWithContext(context.Background(), bbox)
+}
 
-	req.URL.Query().Set("lamin", "50")
-	req.URL.Query().Set("lamax", "50.5")
-	req.URL.Query().Set("lomin", "3")
-	req.URL.Query().Set("lomax", "3.5")
+func (cli *Client) GetStatesWithContext(ctx context.Context, bbox *BoundingBox) (StateResponse, error) {
+	endpoint, _ := url.JoinPath(cli.baseUrl, "states/all")
+	req, _ := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, http.NoBody)
+
+	if bbox != nil {
+		q := req.URL.Query()
+
+		q.Add("lamin", strconv.FormatFloat(bbox.LatitudeMin, 'f', -1, 32))
+		q.Add("lamax", strconv.FormatFloat(bbox.LatitudeMax, 'f', -1, 32))
+		q.Add("lomin", strconv.FormatFloat(bbox.LongitudeMin, 'f', -1, 32))
+		q.Add("lomax", strconv.FormatFloat(bbox.LongitudeMax, 'f', -1, 32))
+
+		req.URL.RawQuery = q.Encode()
+	}
+
 	var respObj StateResponse
 	resp, err := cli.httpClient.Do(req)
 	if err != nil {
