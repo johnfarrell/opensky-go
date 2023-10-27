@@ -4,8 +4,13 @@
 
 <instance-profile id="opensky-go"
                  name="opensky-go"
-                 start-page="starter-topic.md">
+                 start-page="Overview.md">
 
     <toc-element topic="Overview.md"/>
-    <toc-element topic="starter-topic.md"/>
+    <toc-element topic="Getting-Started.md"/>
+    <toc-element topic="Reference.md">
+        <toc-element topic="Client.md">
+            <toc-element topic="Client-Options.md"/>
+        </toc-element>
+    </toc-element>
 </instance-profile>
