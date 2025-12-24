@@ -39,8 +39,14 @@ func (cli *Client) GetStates(bbox *BoundingBox) (StateResponse, error) {
 }
 
 func (cli *Client) GetStatesWithContext(ctx context.Context, bbox *BoundingBox) (StateResponse, error) {
-	endpoint, _ := url.JoinPath(cli.baseUrl, "states/all")
-	req, _ := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, http.NoBody)
+	endpoint, err := url.JoinPath(cli.baseUrl, "states/all")
+	if err != nil {
+		return StateResponse{}, fmt.Errorf("failed to create endpoint url: %w", err)
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, http.NoBody)
+	if err != nil {
+		return StateResponse{}, fmt.Errorf("failed to create request: %w", err)
+	}
 
 	if bbox != nil {
 		q := req.URL.Query()
@@ -60,12 +66,9 @@ func (cli *Client) GetStatesWithContext(ctx context.Context, bbox *BoundingBox) 
 	}
 	defer func() { _ = resp.Body.Close() }()
 
-	var rawResp rawStateResponse
-	if err := json.NewDecoder(resp.Body).Decode(&rawResp); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&respObj); err != nil {
 		return respObj, fmt.Errorf("failed to decode response: %w", err)
 	}
-
-	respObj = rawResp.parse()
 
 	return respObj, nil
 }

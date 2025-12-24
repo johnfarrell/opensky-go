@@ -79,7 +79,6 @@ func TestNewClient(t *testing.T) {
 }
 
 func TestClient_GetStates(t *testing.T) {
-
 	cli, _ := NewClient(WithTimeout(120 * time.Second))
 	tests := []struct {
 		name    string
